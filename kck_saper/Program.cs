@@ -1,5 +1,5 @@
 ﻿using System;
-
+using Figgle;
 namespace kck_saper
 {
     class Pole
@@ -10,8 +10,9 @@ namespace kck_saper
     class Plansza
     {
         Pole[,] plansza;
-        int max_x;
-        int max_y;
+        public int max_x=10;
+        public int max_y=10;
+        public int liczba_min=10;
         public void generuj_plasze(int x, int y) //rozmiary plaszy
         {
             max_x = x;
@@ -55,8 +56,108 @@ namespace kck_saper
                 }
             }
         }
+        public void wys_logo()
+        {
+            Console.WriteLine(FiggleFonts.Standard.Render("My  Sapper!"));
+        }
+        public bool wys_menu()
+        {
+            Console.Clear();
+            wys_logo();
+            Console.Write("1. Wybierz rozmiar Pola (obecnie {0} x {1}) \n", max_x, max_y);
+            Console.Write("2. Wybierz liczbe min (obecnie {0}, zalecane liczba {1}) \n", liczba_min, (max_x * max_y) / 10);
+            Console.Write("3. Odpal gre \n");
+            Console.Write("4. Zamknij program \n");
+            Console.Write("Wybierz opcje przez naciśnięcie odpowiedniego przycisku: ");
+            switch (Console.ReadLine())
+            {
+                case "1":
+                    wyb_rozmiar_pola();
+                    return true;
+                case "2":
+                    wyb_liczbe_min();
+                    return true;
+                case "3":
+                    wys_plansze();
+                    return true;
+                case "4":
+                    return false;
+                default:
+                    return true;
+            }
+        }
+        public void wyb_rozmiar_pola()
+        {
+            Console.Clear();
+            int x, y;
+            wys_logo();
+            Console.Write("Obecny rozmiar pola: {0}x{1} \n", max_x,max_y);
+            Console.Write("Podaj liczbe rzędów(x):");
+            x = Convert.ToInt32(Console.ReadLine());
+            Console.Write("Podaj liczbe kolumn(y):");
+            y = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+            wys_logo();
+            Console.Write("Zmienić rozmiar pola z {0}x{1} na {2}x{3}? (t,n)\n", max_x, max_y, x, y);
+            while (1==1)
+            {
+                switch (Console.ReadLine())
+                {
+                    case "t":
+                        max_x = x;
+                        max_y = y;
+                        wys_menu();
+                        return;
+                    case "n":
+                        wys_menu();
+                        return;
+                    default:
+                        Console.Clear();
+                        wys_logo();
+                        Console.Write("Podaj poprawną odpowiedz \n");
+                        Console.Write("Zmienić rozmiar pola z {0}x{1} na {2}x{3}? (t,n)\n", max_x, max_y, x, y);
+                        break;
+                }
+            }
+
+        }
+        public void wyb_liczbe_min()
+        {
+            Console.Clear();
+            wys_logo();
+            Console.Write("Obecna liczba min: {0} \n", liczba_min);
+            Console.Write("Wybierz liczbe min (zalecana liczba {0}): ",(max_x*max_y)/10);
+            int bomby = Convert.ToInt32(Console.ReadLine());
+            Console.Clear();
+            wys_logo();
+            Console.Write("Zmienić liczbe min z {0} na {1}? (t,n)\n",liczba_min,bomby );
+            while(1==1)
+            {
+                switch(Console.ReadLine())
+                {
+                    case "t":
+                        liczba_min = bomby;
+                        wys_menu();
+                        return;
+                    case "n":
+                        wys_menu();
+                        return;
+                    default:
+                        Console.Clear();
+                        wys_logo();
+                        Console.Write("Podaj poprawną odpowiedz \n");
+                        Console.Write("Zmienić liczbe min z {0} na {1}? (t,n) \n", liczba_min, bomby);
+                        break;
+
+                }
+            }
+        }
+        
+
         public void wys_plansze()
         {
+            generuj_plasze(max_x, max_y);
+            losuj_pozycje(liczba_min);
             Console.WriteLine("Wielkosc pola {0} x {1}", max_x,max_y);
             for (int i = 0; i < max_x; ++i)
             {
@@ -77,9 +178,7 @@ namespace kck_saper
         static void Main(string[] args)
         {
             Plansza p = new Plansza();
-            p.generuj_plasze(10,10);
-            p.losuj_pozycje(10);
-            p.wys_plansze();
+            while(p.wys_menu());
         }
     }
 }
