@@ -9,10 +9,39 @@ namespace kck_saper
     }
     class Plansza
     {
+        protected static int origRow = 8;
+        protected static int origCol = 2;
         Pole[,] plansza;
+        int koniec;
         public int max_x=10;
         public int max_y=10;
-        public int liczba_min=10;
+        public int liczba_min=10; 
+        protected static void WriteAtInt(int s, int x, int y)
+        {
+            try
+            {
+                Console.SetCursorPosition(origCol + x, origRow + y);
+                Console.Write(s);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.Clear();
+                Console.WriteLine(e.Message);
+            }
+        }
+        protected static void WriteAtString(String s, int x, int y)
+        {
+            try
+            {
+                Console.SetCursorPosition(origCol + x, origRow + y);
+                Console.Write(s);
+            }
+            catch (ArgumentOutOfRangeException e)
+            {
+                Console.Clear();
+                Console.WriteLine(e.Message);
+            }
+        }
         public void generuj_plasze(int x, int y) //rozmiary plaszy
         {
             max_x = x;
@@ -78,7 +107,9 @@ namespace kck_saper
                     wyb_liczbe_min();
                     return true;
                 case "3":
-                    wys_plansze();
+                    generuj_plasze(max_x, max_y);
+                    losuj_pozycje(liczba_min);
+                    wys_plansze(0,0);
                     return true;
                 case "4":
                     return false;
@@ -152,23 +183,95 @@ namespace kck_saper
                 }
             }
         }
-        
 
-        public void wys_plansze()
+        public void wys_plansze(int obx,int oby)
         {
-            generuj_plasze(max_x, max_y);
-            losuj_pozycje(liczba_min);
+            Console.Clear();
+            wys_logo();
+            int x = obx, y = oby;
             Console.WriteLine("Wielkosc pola {0} x {1}", max_x,max_y);
             for (int i = 0; i < max_x; ++i)
             {
                 for (int j = 0; j < max_y; ++j)
                 {
-                    Console.Write(plansza[i, j].wartosc);
+                    if (plansza[i,j].odkryte)
+                    {
+                        if (i == x &&  j == y)
+                            Console.ForegroundColor = ConsoleColor.Blue;
+                        WriteAtInt(plansza[i, j].wartosc,i,j);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
+                    else
+                    {
+                        if (i == x && j == y)
+                           Console.ForegroundColor = ConsoleColor.Blue;
+                        WriteAtString("*", i, j);
+                        Console.ForegroundColor = ConsoleColor.White;
+                    }
                 }
+                Console.WriteLine(" \n Obecne pole rząd {0} kolumna {1} \n", x+1, y+1);
+                Console.Write("z-bomba");
                 Console.Write("\n");
             }
 
-                Console.ReadKey();
+            gra(x, y);
+        }
+        public void gra(int x, int y)
+        {
+            while (koniec==0)
+            {
+                if (Console.KeyAvailable)
+                {
+                    ConsoleKeyInfo key = Console.ReadKey(true);
+                    switch(key.Key)
+                    {
+                        case ConsoleKey.LeftArrow:
+                            {
+                                if(x>0)
+                                    --x;
+                                wys_plansze(x, y);
+                                break;
+                            }
+                        case ConsoleKey.RightArrow:
+                            {
+                                if (x < max_x-1)
+                                    ++x;
+                                wys_plansze(x, y);
+                                break;
+                            }
+                        case ConsoleKey.UpArrow:
+                            {
+                                if (y > 0)
+                                    --y;
+                                wys_plansze(x, y);
+                                break;
+                            }
+                        case ConsoleKey.DownArrow:
+                            {
+                                if (y < max_y - 1)
+                                    ++y;
+                                wys_plansze(x, y);
+                                break;
+                            }
+                        case ConsoleKey.Z:
+                            {
+                                Console.Write("x{0} y{1}",x,y);
+                                plansza[x, y].odkryte = true;
+                                wys_plansze(x, y);
+                                break;
+                            }
+                        case ConsoleKey.Escape:
+                            {
+                                return;
+                            }
+                        default:
+                            {
+                                break;
+                            }
+
+                    }
+                }
+            }
         }
     }
      
