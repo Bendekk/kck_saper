@@ -23,6 +23,12 @@ namespace kck_saper
                 return false;
             return true;
         }
+        protected bool check_size(int min,int max,int x)
+        {
+            if (x < min || x > max )
+                return true;
+            return false;
+        }
         protected static void WriteAtInt(int s, int x, int y)
         {
             try
@@ -135,21 +141,22 @@ namespace kck_saper
             Console.Write("Obecny rozmiar pola: {0}x{1} \n", max_x,max_y);
             Console.Write("Podaj liczbe rzędów(x):");
             x = (Console.ReadLine());
-            while(check_int(x))
+            while(check_int(x) || check_size(0, 31, Int32.Parse(x)))
             {
-                Console.Write("Podaj poprawną liczbe rzędów(x):");
+                Console.Write("Podaj poprawną liczbe rzędów(x>0 i x<31):");
                 x = (Console.ReadLine());
             }
             xi = Int32.Parse(x);
             Console.Write("Podaj liczbe kolumn(y):");
             y = (Console.ReadLine());
-            while (check_int(y))
+            while (check_int(y) || check_size(0, 31, Int32.Parse(x)))
             {
-                Console.Write("Podaj poprawną liczbe kolumn(y):");
+                Console.Write("Podaj poprawną liczbe kolumn(y>0 i y<31):");
                 y = (Console.ReadLine());
             }
+
             yi = Int32.Parse(y);
-            Console.Clear();
+                Console.Clear();
             wys_logo();
             Console.Write("Zmienić rozmiar pola z {0}x{1} na {2}x{3}? (t,n)\n", max_x, max_y, xi, yi);
             while (1==1)
@@ -203,12 +210,12 @@ namespace kck_saper
             Console.Write("Obecna liczba min: {0} \n", liczba_min);
             Console.Write("Wybierz liczbe min (zalecana liczba {0}): ",(max_x*max_y)/5);
             bombys = Console.ReadLine();
-            while (check_int(bombys))
+            while (check_int(bombys) || Int32.Parse(bombys)>max_x*max_y || Int32.Parse(bombys)<0)
             {
-                Console.Write("Podaj poprawną liczbe bomb (zalecana liczba {0}): ", (max_x * max_y) / 5);
+                Console.Write("Podaj poprawną liczbe bomb (zalecana liczba {0},maksymalna: {1}): ", (max_x * max_y) / 5,max_x*max_y-1);
                 bombys = (Console.ReadLine());
             }
-            bomby= Int32.Parse(bombys);
+            bomby = Int32.Parse(bombys);
             Console.Clear();
             wys_logo();
             Console.Write("Zmienić liczbe min z {0} na {1}? (t,n)\n",liczba_min,bomby );
@@ -277,7 +284,10 @@ namespace kck_saper
                     {
                         if (i == x &&  j == y)
                             Console.ForegroundColor = ConsoleColor.Blue;
-                        WriteAtInt(plansza[i, j].wartosc,i,j);
+                        if (plansza[i,j].wartosc==9)
+                            WriteAtString("B", i, j);
+                        else
+                            WriteAtInt(plansza[i, j].wartosc,i,j);
                         Console.ForegroundColor = ConsoleColor.White;
                     }
                     else if(plansza[i, j].odkryte == 2)
@@ -359,7 +369,10 @@ namespace kck_saper
                             {
 
                                 if (plansza[x, y].wartosc == 9)
+                                {
+                                    plansza[x, y].odkryte = 1;
                                     koniec = 2;
+                                }
                                 else if (plansza[x, y].wartosc == 0)
                                     odkryte_zero(x, y);
                                 else
@@ -379,8 +392,28 @@ namespace kck_saper
                             }
                         case ConsoleKey.Escape:
                             {
-                                wys_menu();
-                                break;
+                                Console.Clear();
+                                wys_logo();
+                                Console.Write("Napewno chcesz wylączyć sapera i wrócić do menu(t,n)\n");
+                                while (1 == 1)
+                                {
+                                    switch (Console.ReadLine())
+                                    {
+                                        case "t":
+                                            wys_menu();
+                                            return;
+                                        case "n":
+                                            wys_plansze(x, y);
+                                            return;
+                                        default:
+                                            Console.Clear();
+                                            wys_logo();
+                                            Console.Write("Podaj poprawną odpowiedz \n");
+                                            Console.Write("Napewno chcesz wylączyć sapera i wrócić do menu(t,n)\n");
+                                            break;
+
+                                    }
+                                }
                             }
                         default:
                             {
